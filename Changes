@@ -1,0 +1,28 @@
+Revision history for Perl extension Test::Files.
+
+0.03  Wed Oct 15 10:02:49 CDT 2003
+    - Made various refactorings to increase code reuse.
+    - Changed from using Test::Differences to using Text::Diff.  This has
+      two advantages:
+      1. It makes it slightly easier to have the location of the error
+         correctly reported when a test fails.
+      2. It enables compares_dirs_ok which needs to compare lots of files
+         while reporting a single error.
+    - Added compare_dirs_ok which compares all files in a pair of directory,
+      failing with diff diagnostics if any disagree.
+    
+
+0.02  Mon Oct 13 15:03:17 CDT 2003
+    - Added dir_contains_ok which checks a directory for the presence of
+      named files.
+    - Added dir_only_contains_ok which makes sure that a directory has
+      exactly a specified list of elements, nothing more or less.
+      This is a bit awkward since you must currently list subdirectories
+      explicitly, lest they show up in the list of unexpectedly seen files.
+    - Corrected diagnostic output so it works like other Test:: modules.
+      Previously, I had folded some error output into the test name
+
+0.01  Thu Oct  9 13:14:55 2003
+	- original version; created by h2xs 1.22 with options
+		-AXn Test::Files -b 5.6.0
+

@@ -1,0 +1,81 @@
+# Before `make install' is performed this script should be runnable with
+# `make test'. After `make install' it should work as `perl 1.t'
+
+BEGIN {
+    if( $ENV{PERL_CORE} ) {
+        chdir 't';
+        @INC = ('../lib', 'lib');
+    }
+    else {
+        unshift @INC, 't/lib';
+    }
+}
+
+use strict;
+
+require Test::Simple::Catch;
+my ($out, $err) = Test::Simple::Catch::caught();
+
+package My::Test;
+
+print "1..2\n";
+
+my $test_num = 1;
+# Utility testing functions.  Stolen from the Test::Simple test suite.
+sub ok ($;$) {
+    my($test, $name) = @_;
+    my $ok = '';
+    $ok .= "not " unless $test;
+    $ok .= "ok $test_num";
+    $ok .= " - $name" if defined $name;
+    $ok .= "\n";
+    print $ok;
+    $test_num++;
+}
+
+package main;
+require Test::Simple;
+Test::Simple->import(tests => 2);
+
+use Test::Files;
+
+file_ok("t/ok_pass.dat", <<"EOF", "passing text");
+This file
+is for 03ok_pass.t
+EOF
+file_ok("t/ok_pass.dat", "This file\nis wrong", "failing text");
+
+END {
+#    print "out:$$out:tuo\nerr:$$err:rre\n";
+    My::Test::ok($$out eq <<"EOF", "standard out for simple ok");
+1..2
+ok 1 - passing text
+not ok 2 - failing text
+EOF
+
+    my @err_lines = split /\n/, $$err;
+    shift @err_lines;
+    my $err = join "", @err_lines;
+    my @expected  = (
+        '# +---+----------------------+-----------+',
+        '# | Ln|Got                   |Expected   |',
+        '# +---+----------------------+-----------+',
+        '# |  1|This file             |This file  |',
+        '# *  2|is for 03ok_pass.t\n  |is wrong   *',
+        '# +---+----------------------+-----------+',
+    );
+    my $expected = join "", @expected;
+
+    My::Test::ok($err eq $expected, "error text for simple ok");
+    
+#    for (my $i = 0; $i < @err_lines; $i++) {
+#        My::Test::ok(
+#            $err_lines[$i] eq $expected[$i],
+#            "error text for simple ok line $i"
+#        );
+#    }
+
+    Test::Builder->new->no_ending(1);
+    exit 0;
+}
+

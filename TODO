@@ -1,0 +1,31 @@
+Functions Schwern suggested which are not implemented yet:
+
+#-----------------------------------------------------
+
+dir_ok( "some/dir", {
+        "foo"       => "some/dir/foo would contain this",
+        "bar"       => "some/dir/bar would contain this",
+        "baz/biff"  => "some/dir/baz/biff would contain this"
+ });
+# I suggested using undef for the values here to request a check of structure
+# only, that is only file names would be examined, not contents.  Yet,
+# Schwern had already suggested dir_contains_ok, which is probably more
+# directly intelligiable.
+
+#-----------------------------------------------------
+
+find_ok( "some/dir", sub { which will be run against all files in some/dir
+                           and returns true if they pass } );
+
+#-----------------------------------------------------
+
+I suggested:
+
+dirs_agree("dir1", "dir2")
+
+Schwern suggested a new name for dirs_agree:
+
+compare_dirs_ok instead of dirs_agree
+
+(I'm extrapolating, he didn't make a direct suggestion, but his earlier
+suggestions point to something like this.)
