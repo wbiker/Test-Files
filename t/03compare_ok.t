@@ -31,10 +31,11 @@ compare_ok("t/ok_pass.dat", "t/ok_pass.same.dat", "passing file");
 test_test("passing file");
 
 test_out("not ok 1 - failing file");
-$line = line_num(+8);
+$line = line_num(+9);
 test_diag("    Failed test (t/03compare_ok.t at line $line)",
 '+---+--------------------+-------------------+',
-'| Ln|Got                 |Expected           |',
+'|   |Got                 |Expected           |',
+'| Ln|                    |                   |',
 '+---+--------------------+-------------------+',
 '|  1|This file           |This file          |',
 '*  2|is for 03ok_pass.t  |is for many tests  *',

@@ -21,7 +21,7 @@ our @EXPORT = qw(
     compare_dirs_filter_ok
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $Test = Test::Builder->new;
 my $diff_options = {
@@ -32,6 +32,8 @@ my $diff_options = {
     OFFSET_A    => 1,
     OFFSET_B    => 1,
     INDEX_LABEL => "Ln",
+    MTIME_A     => "",
+    MTIME_B     => "",
 };
 
 sub file_ok {
@@ -293,7 +295,7 @@ sub compare_dirs_filter_ok {
             }
         }
         else {
-            push @diags, @result;
+            push @diags, "$result[0]\n";
         }
     };
 
@@ -301,7 +303,7 @@ sub compare_dirs_filter_ok {
 
     if (@diags) {
         $Test->ok(0, $name);
-        $Test->diag(@diags);
+        $Test->diag(sort @diags);
     }
     else {
         $Test->ok(1, $name);

@@ -1,5 +1,20 @@
 Revision history for Perl extension Test::Files.
 
+0.05  Mon Oct 20 15:13:50 CDT 2003
+    - Corrected diagnostic output in compare_dirs* so that each missing file
+      is listed on its own line.  Previously, they were juxtaposed on one
+      line, including very pleasant #'s for decoration.
+    - Changed Files.pm so none of the tests report timestamps.  Some OSes
+      (notably Solaris) translated the timestamps, probably to deal with
+      time zones.  I am explicitly deciding that timestamps do not count
+      in file comparisons.  If you need to test timestamps, use -M etc.
+      Remember that the person installing your module won't always be in
+      your timezone.
+    - Corrected tests to reflect the removal of time stamps from file_ok
+      output.
+    - Sorted the list of missing files in compare_dirs* so that I can test
+      the error message (and the new vesion is neater).
+
 0.04  Fri Oct 17 09:14:20 CDT 2003
     - Added compare_dirs_filter_ok which works like compare_dirs_ok, but sends
       each line of input through a caller supplied filter function first.

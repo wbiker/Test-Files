@@ -1,4 +1,4 @@
-use Test::Builder::Tester tests => 4;
+use Test::Builder::Tester tests => 5;
 
 use Test::Files;
 
@@ -17,11 +17,12 @@ compare_dirs_ok('t/lib',         't/missing_dir', "missing second dir");
 test_test("missing second dir");
 
 test_out("not ok 1 - failing due to text diff");
-$line = line_num(+16);
+$line = line_num(+17);
 test_diag(
 "    Failed test (t/06compare_dirs.t at line $line)",
 '+---+-----------------------------------+---+---------------------------------+',
-'| Ln|t/lib/Test/Simple/Catch.pm         | Ln|t/lib_fail/Test/Simple/Catch.pm  |',
+'|   |t/lib/Test/Simple/Catch.pm         |   |t/lib_fail/Test/Simple/Catch.pm  |',
+'| Ln|                                   | Ln|                                 |',
 '+---+-----------------------------------+---+---------------------------------+',
 '| 12|$t->failure_output($err_fh);       | 12|$t->failure_output($err_fh);     |',
 '| 13|$t->todo_output($err_fh);          | 13|$t->todo_output($err_fh);        |',
@@ -35,6 +36,15 @@ test_diag(
 '+---+-----------------------------------+---+---------------------------------+');
 compare_dirs_ok('t/lib',         't/lib_fail',    "failing due to text diff");
 test_test("failing due to text diff");
+
+test_out("not ok 1 - failing due to structure diff");
+$line = line_num(+5);
+test_diag("    Failed test (t/06compare_dirs.t at line $line)",
+          't/time/t1 absent',
+          't/time/t2 absent',
+          't/time/t3 absent');
+compare_dirs_ok('t/time3', 't/time', "failing due to structure diff");
+test_test("failing due to structure diff");
 
 test_out("ok 1 - passing");
 compare_dirs_ok('t/lib',         't/lib_pass',    "passing");

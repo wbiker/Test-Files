@@ -16,6 +16,10 @@ t/lib_fail/Test/Simple/Catch.pm
 t/lib_pass/Test/Simple/Catch.pm
 t/time/time_stamp.dat
 t/time2/time_stamp.dat
+t/time3/t1
+t/time3/t2
+t/time3/t3
+t/time3/time_stamp.dat
 t/ok_pass.dat
 t/ok_pass.diff.dat
 t/ok_pass.same.dat

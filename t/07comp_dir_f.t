@@ -25,10 +25,11 @@ compare_dirs_filter_ok('t/time', 't/lib_fail',    "missing coderef");
 test_test("missing coderef");
 
 test_out("not ok 1 - failing noop filter");
-$line = line_num(+9);
+$line = line_num(+10);
 test_diag("    Failed test (t/07comp_dir_f.t at line $line)",
 '+---+----------------------------------------------------------+----------------------------------------------------------+',
-'| Ln|t/time/time_stamp.dat                                     |t/time2/time_stamp.dat                                    |',
+'|   |t/time/time_stamp.dat                                     |t/time2/time_stamp.dat                                    |',
+'| Ln|                                                          |                                                          |',
 '+---+----------------------------------------------------------+----------------------------------------------------------+',
 '|  1|This file                                                 |This file                                                 |',
 '|  2|is for 03ok_pass.t                                        |is for 03ok_pass.t                                        |',
