@@ -1,5 +1,16 @@
 Revision history for Perl extension Test::Files.
 
+0.04  Fri Oct 17 09:14:20 CDT 2003
+    - Added compare_dirs_filter_ok which works like compare_dirs_ok, but sends
+      each line of input through a caller supplied filter function first.
+      This allows you to remove things like timestamps which though different
+      should not count as failure.
+    - Refactored to avoid code duplication in the compare_dirs* functions.
+    - On advice from Schwern, converted tests to use the very nice
+      Test::Builder::Tester.  This made the tests nicer and easier to work
+      on, but had no affect on the Files.pm code.
+    - Improved the documentation (well I think it as in improvement)
+
 0.03  Wed Oct 15 10:02:49 CDT 2003
     - Made various refactorings to increase code reuse.
     - Changed from using Test::Differences to using Text::Diff.  This has

@@ -25,7 +25,19 @@ dirs_agree("dir1", "dir2")
 
 Schwern suggested a new name for dirs_agree:
 
-compare_dirs_ok instead of dirs_agree
+compare_dirs_ok instead of dirs_agree (implemented in 0.03)
 
 (I'm extrapolating, he didn't make a direct suggestion, but his earlier
 suggestions point to something like this.)
+
+#-----------------------------------------------------
+
+After trying compare_dirs_ok I immediately wanted to be able to exclude
+some lines from the comparison.  Namely, in my example, dates were the
+only differences.  So, I still wanted the files to count as the same, even
+though the dates differed.  That led to:
+
+compare_dirs_filter_ok($dir1, $dir2, \&filter, $name) (implemented in 0.04)
+
+filter is called for all lines of input, it must return the line with
+any needed changes.  If the line should be omitted, it should return "".

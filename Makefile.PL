@@ -5,9 +5,10 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'Test::Files',
     'VERSION_FROM'	=> 'Files.pm', # finds $VERSION
-    'PREREQ_PM'		=> {Test::Builder     => 0,
-                            Test::More        => 0,
-                            Text::Diff        => 0,
+    'PREREQ_PM'		=> {Test::Builder         => 0,
+                            Test::More            => 0,
+                            Test::Builder::Tester => 0,
+                            Text::Diff            => 0,
                             }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM => 'Files.pm', # retrieve abstract from module
