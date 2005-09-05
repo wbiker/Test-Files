@@ -1,5 +1,13 @@
 Revision history for Perl extension Test::Files.
 
+0.10  Mon Sep  5 10:57:12 CDT 2005
+    - Converted to File::Spec inside the module and in the test suite.
+    - Added compare_filter_ok which works like compare_dirs_filter_ok,
+      but for single comparisons.
+    - Added documentation to make clear that this module uses Text::Diff
+      to report tables of diff output when text contents of files it is
+      comparing differ.
+
 0.05  Mon Oct 20 15:13:50 CDT 2003
     - Corrected diagnostic output in compare_dirs* so that each missing file
       is listed on its own line.  Previously, they were juxtaposed on one

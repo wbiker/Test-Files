@@ -11,6 +11,7 @@ t/04dir_contains_ok.t
 t/05dir_only_con.t
 t/06compare_dirs.t
 t/07comp_dir_f.t
+t/08comp_filt.t
 t/lib/Test/Simple/Catch.pm
 t/lib_fail/Test/Simple/Catch.pm
 t/lib_pass/Test/Simple/Catch.pm
@@ -23,3 +24,4 @@ t/time3/time_stamp.dat
 t/ok_pass.dat
 t/ok_pass.diff.dat
 t/ok_pass.same.dat
+META.yml                                 Module meta-data (added by MakeMaker)

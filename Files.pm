@@ -3,8 +3,8 @@ use Test::Builder;
 use Test::More;
 use Text::Diff;
 use File::Find;
+use File::Spec;
 
-use 5.006;
 use strict;
 use warnings;  # This is off in Test::More, eventually it may have to go.
 
@@ -15,13 +15,14 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(
     file_ok
     compare_ok
+    compare_filter_ok
     dir_contains_ok
     dir_only_contains_ok
     compare_dirs_ok
     compare_dirs_filter_ok
 );
 
-our $VERSION = '0.05';
+our $VERSION = '0.10';
 
 my $Test = Test::Builder->new;
 my $diff_options = {
@@ -109,7 +110,17 @@ sub compare_ok {
     my $got_file      = shift;
     my $expected_file = shift;
     my $name          = shift;
-    my @read_result   = _read_two_files($got_file, $expected_file);
+
+    @_ = ($got_file, $expected_file, undef, $name);
+    goto &compare_filter_ok;
+}
+
+sub compare_filter_ok {
+    my $got_file      = shift;
+    my $expected_file = shift;
+    my $filter        = shift;
+    my $name          = shift;
+    my @read_result   = _read_two_files($got_file, $expected_file, $filter);
     my $files_exist   = shift @read_result;
 
     if ($files_exist) {
@@ -151,7 +162,8 @@ sub _dir_missing_helper {
 
     my @missing;
     foreach my $element (@$list) {
-        push @missing, $element unless (-e "$base_dir/$element");
+        my $elem_path = File::Spec->catfile( $base_dir, $element );
+        push @missing, $element unless (-e $elem_path );
     }
     return (\@missing);
 }
@@ -212,7 +224,7 @@ sub dir_only_contains_ok {
     # by defining $contains here, it can use our scope
     my $contains = sub {
         my $name = $File::Find::name;
-        $name    =~ s!.*$base_dir/?!!;
+        $name    = File::Spec->abs2rel( $name, $base_dir );
         return if length($name) < 1;  # skip the base directory
         push @unexpected, $name unless (exists $expected{$name});
     };
@@ -267,11 +279,17 @@ sub compare_dirs_filter_ok {
 
     my $matches = sub {
         my $name = $File::Find::name;
+
         return if (-d $name);
-        $name    =~ s!.*$first_dir/?!!;
+
+        $name    = File::Spec->abs2rel( $name, $first_dir );
         return if length($name) < 1;  # skip the base directory
+
+        my $first_file  = File::Spec->catfile( $first_dir,  $name );
+        my $second_file = File::Spec->catfile( $second_dir, $name );
+
         my @result = _read_two_files(
-            "$first_dir/$name", "$second_dir/$name", $filter
+            $first_file, $second_file, $filter
         );
         my $files_exist = shift @result;
 
@@ -282,8 +300,8 @@ sub compare_dirs_filter_ok {
                 \$expected,
                 {
                     %$diff_options,
-                    FILENAME_A => "$first_dir/$name",
-                    FILENAME_B => "$second_dir/$name"
+                    FILENAME_A => $first_file,
+                    FILENAME_B => $second_file,
                 }
             );
             chomp $diff;
@@ -321,17 +339,24 @@ Test::Files - A Test::Builder based module to ease testing with files and dirs
 
     use Test::More tests => 5;
     use Test::Files;
+    use File::Spec;
 
-    file_ok("path/to/some/file", "contents\nof file", "some file");
+    my $some_file  = File::Spec->catfile( qw/ path to some file / );
+    my $other_file = File::Spec->catfile( qw/ path to other file / );
+    my $some_dir   = File::Spec->catdir ( qw/ some dir / );
+    my $other_dir  = File::Spec->catdir ( qw/ other dir with same stuff / );
 
-    compare_ok("path/to/a/file", "path/to/correct/file", "they're the same");
+    file_ok($some_file, "contents\nof file", "some file");
 
-    dir_contains_ok     ( "some/dir", [qw(files some/dir should contain)] );
+    compare_ok($some_file, $other_file, "they're the same");
+    compare_filter_ok($file1, $file2, \&filter, "they're almost the same");
 
-    dir_only_contains_ok( "some/dir", [qw(files some/dir should contain)] );
+    dir_contains_ok     ( $some_dir, [qw(files some_dir should contain)] );
 
-    compare_dirs_ok("some/dir", "some/other/dir/with/exactly/the/same/stuff");
-    compare_dirs_filter_ok("some/dir", "some/other/dir", \&filter_fcn);
+    dir_only_contains_ok( $some_dir, [qw(files some_dir should contain)] );
+
+    compare_dirs_ok($some_dir, $other_dir);
+    compare_dirs_filter_ok($some_dir, $other_dir, \&filter_fcn);
 
 =head1 ABSTRACT
 
@@ -353,6 +378,11 @@ compare the contents of a file to a string
 =item compare_ok
 
 compare the contents of two files
+
+=item compare_filter_ok
+
+compare the contents of two files, but sends each line through a filter
+so things that shouldn't count against success can be stripped
 
 =item dir_contains_ok
 
@@ -379,6 +409,14 @@ Though the SYNOPSIS examples don't all have names, you can and should provide
 a name for each test.  Names are omitted above only to reduce clutter and line
 widths.
 
+You should follow the lead of the SYNOPSIS examples and use File::Spec.
+This makes it much more likely that your tests will pass on a different
+operating system.
+
+All of the content comparison routines provide diff diagnostic output
+when they report failure.  Currently that diff output is always in table
+form and can't be changed.
+
 Most of the functions are self explanatory.  One exception is
 C<compare_dirs_filter_ok> which compares two directory trees, like
 C<compare_dirs_ok> but with a twist.  The twist is a filter which each
@@ -389,8 +427,8 @@ was identical, except those dates.
 
 The filter function receives each line of each file.  It may perform
 any necessary transformations (like excising dates), then it must
-return the line in (possibly) transformed state.  For example, my filter
-was
+return the line in (possibly) transformed state.  For example, my first
+filter was
 
     sub chop_dates {
         my $line = shift;
@@ -403,20 +441,29 @@ unchanged and my failing tests started passing as expected.  If you want
 to exclude the line from consideration, return "" (do not return undef,
 that makes it harder to chain filters together and might lead to warnings).
 
+C<compare_filter_ok> works in a similar manner for a single file comparison.
+
+The test suite has examples of the use of each function and what the
+output looks like on failure, though it that doesn't necessarily make
+them easy to read.
+
 =head2 EXPORT
 
-file_ok
-compare_ok
-dir_contains_ok
-dir_only_contains_ok
-compare_dirs_ok
-compare_dirs_filter_ok
+    file_ok
+    compare_ok
+    compare_filter_ok
+    dir_contains_ok
+    dir_only_contains_ok
+    compare_dirs_ok
+    compare_dirs_filter_ok
 
 =head1 DEPENDENCIES
 
-Test::Builder
-Test::More
-Test::Differences
+    Test::Builder
+    Test::More
+    Text::Diff
+    Algorithm::Diff
+    Test::Builder::Tester (used only during testing)
 
 =head1 SEE ALSO
 
@@ -429,7 +476,7 @@ Phil Crow, E<lt>philcrow2000@yahoo.com<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2003 by Phil Crow
+Copyright 2003-2005 by Phil Crow
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5.8.1 itself. 

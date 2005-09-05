@@ -1,3 +1,12 @@
+A user pointed out an error (in his opinion):
+  compare_dirs_ok does not work properly on second level directories
+  I have not verified that this error occurs
+
+The same user said that once compare_dirs_ok is fixed, there should
+be an option like --exclude in the standard diff.
+
+#-----------------------------------------------------
+
 Functions Schwern suggested which are not implemented yet:
 
 #-----------------------------------------------------
@@ -41,3 +50,10 @@ compare_dirs_filter_ok($dir1, $dir2, \&filter, $name) (implemented in 0.04)
 
 filter is called for all lines of input, it must return the line with
 any needed changes.  If the line should be omitted, it should return "".
+(implemented in 0.04)
+
+#-----------------------------------------------------
+
+I want compare_filer_ok($file1, $file2, $filter) to work like
+compare_dirs_filter but one file at a time
+(implemented in 0.06)
