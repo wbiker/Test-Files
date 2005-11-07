@@ -1,5 +1,16 @@
 Revision history for Perl extension Test::Files.
 
+0.11  Mon Nov  7 17:01:59 CST 2005
+    - Added Algorithm::Diff to the prereq list in Makefile.PL (Text::Diff
+      already requires it, but I wanted to make it more explicit).
+    - Corrected docs to explain that compare_dirs_ok and
+      compare_dirs_filter_ok compare files from the first directory (and
+      its sub dirs) to files in the second directory.  Files missing from
+      the second directory are noted, but files missing from the first
+      directory are not.  Callers should combine this test with
+      dir_contains_ok or dir_contains_only-ok, if they want to ensure
+      that the first directory is complete.
+
 0.10  Mon Sep  5 10:57:12 CDT 2005
     - Converted to File::Spec inside the module and in the test suite.
     - Added compare_filter_ok which works like compare_dirs_filter_ok,

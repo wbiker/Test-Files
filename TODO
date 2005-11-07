@@ -2,6 +2,9 @@ A user pointed out an error (in his opinion):
   compare_dirs_ok does not work properly on second level directories
   I have not verified that this error occurs
 
+  compare_dirs_ok does not make sure that the first dir has all the
+  files that appear in the second.  It should call dir_contains_only_ok.
+
 The same user said that once compare_dirs_ok is fixed, there should
 be an option like --exclude in the standard diff.
 

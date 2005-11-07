@@ -22,7 +22,7 @@ our @EXPORT = qw(
     compare_dirs_filter_ok
 );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 my $Test = Test::Builder->new;
 my $diff_options = {
@@ -344,25 +344,33 @@ Test::Files - A Test::Builder based module to ease testing with files and dirs
     my $some_file  = File::Spec->catfile( qw/ path to some file / );
     my $other_file = File::Spec->catfile( qw/ path to other file / );
     my $some_dir   = File::Spec->catdir ( qw/ some dir / );
-    my $other_dir  = File::Spec->catdir ( qw/ other dir with same stuff / );
+    my $other_dir  = File::Spec->catdir ( qw/ dir with same stuff / );
 
-    file_ok($some_file, "contents\nof file", "some file");
+    file_ok($some_file, "contents\nof file", "some file has contents");
 
-    compare_ok($some_file, $other_file, "they're the same");
-    compare_filter_ok($file1, $file2, \&filter, "they're almost the same");
+    compare_ok($some_file, $other_file, "files are the same");
+    compare_filter_ok(
+            $file1, $file2, \&filter, "they're almost the same"
+    );
 
-    dir_contains_ok     ( $some_dir, [qw(files some_dir should contain)] );
+    dir_contains_ok(
+            $some_dir,
+            [qw(files some_dir must contain)],
+            "$some_dir has all files in list"
+    );
 
-    dir_only_contains_ok( $some_dir, [qw(files some_dir should contain)] );
+    dir_only_contains_ok(
+        $some_dir,
+        [qw(files some_dir should contain)],
+        "$some_dir has exactly the files in the list"
+    );
 
     compare_dirs_ok($some_dir, $other_dir);
     compare_dirs_filter_ok($some_dir, $other_dir, \&filter_fcn);
 
 =head1 ABSTRACT
 
-  Test::Builder based test helper which helps you test files and their contents.
-  Includes facilities for comparing whole directory trees for structure and/or
-  content.
+  Test::Builder based test helper for file and directory contents.
 
 =head1 DESCRIPTION
 
@@ -437,7 +445,7 @@ filter was
     }
 
 This removes all strings like 2003.10.14.14.17.37.  Everything else is
-unchanged and my failing tests started passing as expected.  If you want
+unchanged and my failing tests started passing when they shold.  If you want
 to exclude the line from consideration, return "" (do not return undef,
 that makes it harder to chain filters together and might lead to warnings).
 
@@ -446,6 +454,15 @@ C<compare_filter_ok> works in a similar manner for a single file comparison.
 The test suite has examples of the use of each function and what the
 output looks like on failure, though it that doesn't necessarily make
 them easy to read.
+
+=head2 BUGS
+
+C<compare_dirs_ok> and C<compare_dirs_filter_ok> do not test for
+whether the first directory has all the files that are in the second.
+If you care about missing files in the first direcotry, you must also
+call C<dir_contains_ok> or C<dir_contains_only_ok>.  The C<compare_dirs_*>
+routines do notice when the second directory does not have a files that
+the first one has.
 
 =head2 EXPORT
 
