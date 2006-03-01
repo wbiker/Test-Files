@@ -58,7 +58,7 @@ test_test("missing second dir");
 #-----------------------------------------------------------------
 
 SKIP: {
-skip "test only for unix, i.e. not for $^O", 1 unless ( $^O =~ /nix|nux/ );
+skip "test only for unix, i.e. not for $^O", 1 unless ( $^O =~ /nix|nux|solaris/ );
 test_out("not ok 1 - failing due to text diff");
 $line = line_num(+17);
 test_diag(

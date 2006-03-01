@@ -70,7 +70,7 @@ test_test("missing coderef");
 #-----------------------------------------------------------------
 
 SKIP: {
-skip "test only for unix, i.e. not for $^O", 1 unless ( $^O =~ /nix|nux/ );
+skip "test only for unix, i.e. not for $^O", 1 unless ( $^O =~ /nix|nux|solaris/ );
 test_out("not ok 1 - failing noop filter");
 $line = line_num(+10);
 test_diag("    Failed test ($test_file at line $line)",

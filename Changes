@@ -1,5 +1,14 @@
 Revision history for Perl extension Test::Files.
 
+0.12 Wed Mar  1 16:35:30 PST 2006
+    Thanks to Robin Barker for help with all of the changes for this release.
+    - Added solaris to the list of unix style operating systems in tests 06
+      and 07.
+    - Altered the wanted sub in dir_only_contains_ok to test more carefully
+      for the base directory (which should be skipped).
+    - Corrected base_dir skip test in compare_dirs_only_ok.  A recent
+      change in File::Spec invalidated the old approach.
+
 0.11  Mon Nov  7 17:01:59 CST 2005
     - Added Algorithm::Diff to the prereq list in Makefile.PL (Text::Diff
       already requires it, but I wanted to make it more explicit).

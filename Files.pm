@@ -22,7 +22,7 @@ our @EXPORT = qw(
     compare_dirs_filter_ok
 );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 my $Test = Test::Builder->new;
 my $diff_options = {
@@ -224,8 +224,8 @@ sub dir_only_contains_ok {
     # by defining $contains here, it can use our scope
     my $contains = sub {
         my $name = $File::Find::name;
+        return if ($name eq $base_dir);
         $name    = File::Spec->abs2rel( $name, $base_dir );
-        return if length($name) < 1;  # skip the base directory
         push @unexpected, $name unless (exists $expected{$name});
     };
 
