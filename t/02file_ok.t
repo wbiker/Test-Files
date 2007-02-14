@@ -1,6 +1,6 @@
 use strict;
 
-use Test::Builder::Tester tests => 3;
+use Test::Builder::Tester tests => 5;
 use File::Spec;
 
 use Test::Files;
@@ -35,9 +35,6 @@ test_test("absent file");
 # Compare text to a file with different text.
 #-----------------------------------------------------------------
 
-# The following test on Solaris failed due to the reported time
-# for the source file being Fri Oct 10 21:51:32 2003 instead of the
-# one shown below.  This has not yet been fixed.
 test_out("not ok 1 - failing text");
 $line = line_num(+9);
 test_diag("    Failed test ($test_file at line $line)",
@@ -51,3 +48,36 @@ test_diag("    Failed test ($test_file at line $line)",
 file_ok($ok_pass_file, "This file\nis wrong", "failing text");
 test_test("failing text");
 
+#-----------------------------------------------------------------
+# file_filter_ok with missing file
+#-----------------------------------------------------------------
+
+test_out("not ok 1 - absent filtered file");
+$line = line_num(+3);
+test_diag("    Failed test ($test_file at line $line)",
+          "$missing_file absent");
+file_filter_ok(
+        "$missing_file",
+        "This file is really absent",
+        \&stip_num,
+        "absent filtered file",
+);
+test_test("absent filtered file");
+
+#-----------------------------------------------------------------
+# Compare file to string with filter.
+#-----------------------------------------------------------------
+
+test_out("ok 1 - passing filtered text");
+file_filter_ok($ok_pass_file, <<"EOF", \&strip_num, "passing filtered text");
+This file
+is for ok_pass.t
+EOF
+test_test("passing filtered text");
+
+sub strip_num {
+    my $line = shift;
+    $line    =~ s/\d+//;
+
+    return $line;
+}

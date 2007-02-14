@@ -14,6 +14,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT = qw(
     file_ok
+    file_filter_ok
     compare_ok
     compare_filter_ok
     dir_contains_ok
@@ -22,7 +23,7 @@ our @EXPORT = qw(
     compare_dirs_filter_ok
 );
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 my $Test = Test::Builder->new;
 my $diff_options = {
@@ -51,6 +52,36 @@ sub file_ok {
     # chomping and reappending the line ending was done in
     # Test::Differences::eq_or_diff
     my $diff = diff($candidate_file, \$expected, $diff_options);
+    chomp $diff;
+    my $failed = length $diff;
+    $diff .= "\n";
+
+    if ($failed) {
+        $Test->ok(0, $name);
+        $Test->diag($diff);
+    }
+    else {
+        $Test->ok(1, $name);
+    }
+}
+
+sub file_filter_ok {
+    my $candidate_file = shift;
+    my $expected       = shift;
+    my $filter         = shift;
+    my $name           = shift;
+
+    unless (open CANDIDATE, "$candidate_file") {
+        $Test->ok(0, $name);
+        $Test->diag( "$candidate_file absent" );
+        return;
+    }
+
+    my $candidate = _read_and_filter_handle( *CANDIDATE, $filter );
+
+    # chomping and reappending the line ending was done in
+    # Test::Differences::eq_or_diff
+    my $diff = diff(\$candidate, \$expected, $diff_options);
     chomp $diff;
     my $failed = length $diff;
     $diff .= "\n";
@@ -348,6 +379,13 @@ Test::Files - A Test::Builder based module to ease testing with files and dirs
 
     file_ok($some_file, "contents\nof file", "some file has contents");
 
+    file_filter_ok(
+        $some_file,
+        "filtered contents\nof file",
+        \&filter,
+        "some file has contents"
+    );
+
     compare_ok($some_file, $other_file, "files are the same");
     compare_filter_ok(
             $file1, $file2, \&filter, "they're almost the same"
@@ -382,6 +420,11 @@ above.  It exports
 =item file_ok 
 
 compare the contents of a file to a string
+
+=item file_filter_ok 
+
+compare the contents of a file to a string, but filter the file first.
+(You must filter your own string if needed.)
 
 =item compare_ok
 
@@ -449,7 +492,9 @@ unchanged and my failing tests started passing when they shold.  If you want
 to exclude the line from consideration, return "" (do not return undef,
 that makes it harder to chain filters together and might lead to warnings).
 
-C<compare_filter_ok> works in a similar manner for a single file comparison.
+C<compare_filter_ok> works in a similar manner for a single file comparison,
+while C<file_filter_ok> filters the file before comparing it to your
+unfiltered string.
 
 The test suite has examples of the use of each function and what the
 output looks like on failure, though it that doesn't necessarily make
@@ -467,6 +512,7 @@ the first one has.
 =head2 EXPORT
 
     file_ok
+    file_filter_ok
     compare_ok
     compare_filter_ok
     dir_contains_ok
@@ -493,7 +539,7 @@ Phil Crow, E<lt>philcrow2000@yahoo.com<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2003-2005 by Phil Crow
+Copyright 2003-2007 by Phil Crow
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5.8.1 itself. 
