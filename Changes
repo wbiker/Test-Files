@@ -1,5 +1,17 @@
 Revision history for Perl extension Test::Files.
 
+0.14 Wed Mar 28 10:14:05 CDT 2007
+    - Removed use Test::More from Test::Files package, which was causing
+      chatter during TODO tests that confused the harness.
+      Thanks to Julien Beasley for pointing out the problem and to
+      Schwern for sending the patch.
+
+Apologies to all CPAN users for omitting the following change entry from
+the 0.13 distribution.
+
+0.13 Wed Feb 14 09:45:54 CST 2007
+    - Added file_filter_ok, like the other filter functions.
+
 0.12 Wed Mar  1 16:35:30 PST 2006
     Thanks to Robin Barker for help with all of the changes for this release.
     - Added solaris to the list of unix style operating systems in tests 06

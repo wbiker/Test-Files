@@ -1,6 +1,5 @@
 package Test::Files;
 use Test::Builder;
-use Test::More;
 use Text::Diff;
 use File::Find;
 use File::Spec;
@@ -23,7 +22,7 @@ our @EXPORT = qw(
     compare_dirs_filter_ok
 );
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 my $Test = Test::Builder->new;
 my $diff_options = {
